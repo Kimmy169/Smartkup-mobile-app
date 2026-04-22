@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SmartKup</string>
+    <string name="loading">Loading...</string>
+    <string name="error_message">An error occurred.</string>
+
+    <string name="category_title">Store Aisles</string>
+
+    <string name="product_id">Product ID: %1$d</string>
+</resources>

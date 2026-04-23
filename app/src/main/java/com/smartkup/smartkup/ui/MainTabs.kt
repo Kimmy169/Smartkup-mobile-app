@@ -25,13 +25,6 @@ fun RecipesScreen() {
 }
 
 // 2. PANTRY SCREEN
-@Composable
-fun PantryScreen() {
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-        Text("Moje Spíž", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-        Text("Zde budou kategorie vašich zásob.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
 
 // 3. PROFILE SCREEN
 @Composable

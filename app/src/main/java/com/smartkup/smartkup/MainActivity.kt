@@ -5,37 +5,52 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smartkup.smartkup.network.RetrofitClient
 import com.smartkup.smartkup.network.SmartkupApi
+import com.smartkup.smartkup.repository.CategoryRepository
 import com.smartkup.smartkup.repository.ShoppingListRepository
 import com.smartkup.smartkup.ui.AppNavigation
+import com.smartkup.smartkup.viewmodel.CategoryViewModel
+import com.smartkup.smartkup.viewmodel.PantryItemViewModel
 import com.smartkup.smartkup.viewmodel.ShoppingListViewModel
 
-// 1. We create a "Factory" that tells Android how to build your ViewModel
+// --- FACTORIES ---
 class ShoppingListViewModelFactory(private val repository: ShoppingListRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ShoppingListViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return ShoppingListViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
+    override fun <T : ViewModel> create(modelClass: Class<T>): T { return ShoppingListViewModel(repository) as T }
 }
 
+class CategoryViewModelFactory(private val repository: CategoryRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T { return CategoryViewModel(repository) as T }
+}
+
+class PantryItemViewModelFactory(private val repository: CategoryRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T { return PantryItemViewModel(repository) as T }
+}
+
+// --- MAIN ACTIVITY ---
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val api = RetrofitClient.instance.create(SmartkupApi::class.java)
-        val repository = ShoppingListRepository(api)
 
-        // 2. We use the Factory to ask Android for the ViewModel.
-        // Now, if you rotate the screen, Android hands you back the EXACT SAME ViewModel!
-        val factory = ShoppingListViewModelFactory(repository)
-        val viewModel = ViewModelProvider(this, factory)[ShoppingListViewModel::class.java]
+        // Repositories
+        val shoppingRepository = ShoppingListRepository(api)
+        val categoryRepository = CategoryRepository(api)
 
         setContent {
-            AppNavigation(shoppingListViewModel = viewModel)
+            // Create all 3 ViewModels safely
+            val shoppingViewModel: ShoppingListViewModel = viewModel(factory = ShoppingListViewModelFactory(shoppingRepository))
+            val categoryViewModel: CategoryViewModel = viewModel(factory = CategoryViewModelFactory(categoryRepository))
+            val pantryItemViewModel: PantryItemViewModel = viewModel(factory = PantryItemViewModelFactory(categoryRepository))
+
+            // Pass them all into the Navigation
+            AppNavigation(
+                shoppingListViewModel = shoppingViewModel,
+                categoryViewModel = categoryViewModel,
+                pantryItemViewModel = pantryItemViewModel
+            )
         }
     }
 }

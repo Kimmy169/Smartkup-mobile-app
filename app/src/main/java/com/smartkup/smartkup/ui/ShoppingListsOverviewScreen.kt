@@ -1,6 +1,9 @@
 package com.smartkup.smartkup.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -11,18 +14,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smartkup.smartkup.viewmodel.ShoppingListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShoppingListsOverviewScreen(onNavigateToList: (Long) -> Unit) {
-    // A temporary list of shopping lists (Later, we will fetch this from the ViewModel/Database!)
-    // We start with your default list.
-    var shoppingLists by remember {
-        mutableStateOf(listOf(Pair(1L, "Týdenní nákup")))
-    }
-
-    // State for the popup dialog
+fun ShoppingListsOverviewScreen(
+    viewModel: ShoppingListViewModel,
+    onNavigateToList: (Long) -> Unit
+) {
+    // Fetch the real lists from the database via ViewModel!
+    val shoppingLists by viewModel.overviewLists.collectAsState()
     var showAddListDialog by remember { mutableStateOf(false) }
+
+    // Optional: Refresh lists when screen appears
+    LaunchedEffect(Unit) { viewModel.loadAllLists() }
 
     Scaffold(
         topBar = {
@@ -34,7 +39,6 @@ fun ShoppingListsOverviewScreen(onNavigateToList: (Long) -> Unit) {
                 )
             )
         },
-        // NEW: The button to add a new shopping list
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showAddListDialog = true },
@@ -44,46 +48,36 @@ fun ShoppingListsOverviewScreen(onNavigateToList: (Long) -> Unit) {
             }
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Loop through our shopping lists and create a card for each one
-            shoppingLists.forEach { (listId, listName) ->
-                ElevatedCard(
-                    onClick = { onNavigateToList(listId) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .padding(bottom = 12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+
+        // If empty, the screen is clean. Otherwise, show the grid!
+        if (shoppingLists.isNotEmpty()) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize().padding(padding),
+                contentPadding = PaddingValues(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(shoppingLists) { list ->
+                    ElevatedCard(
+                        onClick = { onNavigateToList(list.listId) }, // Use the REAL Database ID
+                        modifier = Modifier.fillMaxWidth().height(80.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.ShoppingCart,
-                            contentDescription = "Cart",
-                            modifier = Modifier.size(40.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            Text(listName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                            Text("Kliknutím zobrazíte položky", fontSize = 14.sp)
+                        Row(
+                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Filled.ShoppingCart, contentDescription = null, modifier = Modifier.size(32.dp), tint = MaterialTheme.colorScheme.primary)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(text = list.name, fontSize = 18.sp, fontWeight = FontWeight.Bold) // Use REAL Database Name
                         }
                     }
                 }
             }
         }
 
-        // NEW: The Dialog to create a list
         if (showAddListDialog) {
             var newListName by remember { mutableStateOf("") }
-
             AlertDialog(
                 onDismissRequest = { showAddListDialog = false },
                 title = { Text("Nový nákupní seznam") },
@@ -91,7 +85,7 @@ fun ShoppingListsOverviewScreen(onNavigateToList: (Long) -> Unit) {
                     OutlinedTextField(
                         value = newListName,
                         onValueChange = { newListName = it },
-                        label = { Text("Název seznamu (např. Grilovačka)") },
+                        label = { Text("Název seznamu (např. Oslava)") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -100,22 +94,14 @@ fun ShoppingListsOverviewScreen(onNavigateToList: (Long) -> Unit) {
                     Button(
                         onClick = {
                             if (newListName.isNotBlank()) {
-                                // Generate a fake ID for now (e.g., 2, 3, 4)
-                                val newListId = (shoppingLists.maxOfOrNull { it.first } ?: 0L) + 1L
-                                shoppingLists = shoppingLists + Pair(newListId, newListName)
+                                viewModel.createNewList(newListName)
                                 showAddListDialog = false
                             }
                         },
                         enabled = newListName.isNotBlank()
-                    ) {
-                        Text("Vytvořit")
-                    }
+                    ) { Text("Vytvořit") }
                 },
-                dismissButton = {
-                    TextButton(onClick = { showAddListDialog = false }) {
-                        Text("Zrušit")
-                    }
-                }
+                dismissButton = { TextButton(onClick = { showAddListDialog = false }) { Text("Zrušit") } }
             )
         }
     }

@@ -14,14 +14,18 @@ class ShoppingListRepository(private val api: SmartkupApi) {
     suspend fun fetchShoppingList(listId: Long): ShoppingListResponseDTO? {
         return try {
             val response = api.getShoppingList(listId)
+
             if (response.isSuccessful) {
+                Log.d("API_SUCCESS", "Fetched list! Found ${response.body()?.items?.size} items.")
                 response.body()
             } else {
-                Log.e("ShoppingList", "Server Error: ${response.code()}")
+                Log.e("API_ERROR", "Failed to fetch list. Server said: ${response.code()}")
                 null
             }
         } catch (e: Exception) {
-            Log.e("ShoppingList", "Network or Parsing Error: ${e.localizedMessage}")
+            Log.e("API_CRASH", "Android crashed while trying to read the Shopping List JSON!")
+            Log.e("API_CRASH", "Error details: ${e.message}")
+            e.printStackTrace()
             null
         }
     }
@@ -84,7 +88,6 @@ class ShoppingListRepository(private val api: SmartkupApi) {
 
     suspend fun createList(name: String): Boolean {
         return try {
-            // We pass 0L as ID, Spring Boot will generate the real ID automatically!
             val newList = ShoppingListDetails(listId = 0L, userId = 1L, name = name, status = "active")
             val response = api.createShoppingList(newList)
             response.isSuccessful

@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,7 +25,6 @@ import com.smartkup.smartkup.viewmodel.CategoryViewModel
 @Composable
 fun PantryScreen(
     viewModel: CategoryViewModel,
-    // THIS is the line Android Studio was looking for!
     onCategoryClick: (Long, String) -> Unit
 ) {
     val categories by viewModel.categories.collectAsState()
@@ -57,7 +56,6 @@ fun PantryScreen(
             ) {
                 items(categories) { category ->
                     ElevatedCard(
-                        // And THIS is where we use it!
                         onClick = { onCategoryClick(category.categoryId, category.name) },
                         modifier = Modifier.aspectRatio(1f)
                     ) {
@@ -66,7 +64,7 @@ fun PantryScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            Icon(Icons.Filled.List, contentDescription = null, modifier = Modifier.size(48.dp), tint = MaterialTheme.colorScheme.primary)
+                            Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(48.dp), tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(category.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, textAlign = TextAlign.Center)
                         }

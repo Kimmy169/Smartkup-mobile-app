@@ -8,10 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 
-// 1. RECIPES SCREEN
 @Composable
 fun RecipesScreen() {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
@@ -23,10 +21,6 @@ fun RecipesScreen() {
         }
     }
 }
-
-// 2. PANTRY SCREEN
-
-// 3. PROFILE SCREEN
 @Composable
 fun ProfileScreen() {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {

@@ -61,7 +61,6 @@ fun AppNavigation(
             startDestination = BottomNavItem.Shopping.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            // --- TAB 1: SHOPPING ---
             composable(BottomNavItem.Shopping.route) {
                 ShoppingListsOverviewScreen(
                     viewModel = shoppingListViewModel,
@@ -78,10 +77,8 @@ fun AppNavigation(
                 ShoppingListScreen(viewModel = shoppingListViewModel, onNavigateBack = { navController.popBackStack() })
             }
 
-            // --- TAB 2: RECIPES ---
             composable(BottomNavItem.Recipes.route) { RecipesScreen() }
 
-            // --- TAB 3: PANTRY (The Grid) ---
             composable(BottomNavItem.Pantry.route) {
                 PantryScreen(
                     viewModel = categoryViewModel,
@@ -91,7 +88,6 @@ fun AppNavigation(
                 )
             }
 
-            // --- NESTED DETAIL (Items inside the category) ---
             composable(
                 route = "category_detail/{categoryId}/{categoryName}",
                 arguments = listOf(
@@ -110,7 +106,6 @@ fun AppNavigation(
                 )
             }
 
-            // --- TAB 4: PROFILE ---
             composable(BottomNavItem.Profile.route) { ProfileScreen() }
         }
     }

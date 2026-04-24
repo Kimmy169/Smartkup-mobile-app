@@ -3,7 +3,7 @@ package com.smartkup.smartkup.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartkup.smartkup.model.*
-import com.smartkup.smartkup.repository.CategoryRepository // Or wherever you put the repo method
+import com.smartkup.smartkup.repository.CategoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,16 +19,13 @@ class PantryItemViewModel(private val repository: CategoryRepository) : ViewMode
 
     fun loadItemsForCategory(categoryId: Long) {
         viewModelScope.launch {
-            _isLoading.value = true // 1. Turn spinner ON
+            _isLoading.value = true
             try {
-                // 2. Try to get the data
                 _items.value = repository.getPantryItemsByCategory(categoryId)
             } catch (e: Exception) {
-                // 3. If a 404 or crash happens, catch it so the app doesn't freeze!
                 e.printStackTrace()
-                _items.value = emptyList() // Show empty list if error
+                _items.value = emptyList()
             } finally {
-                // 4. FINALLY block ALWAYS runs, guaranteeing the spinner turns OFF
                 _isLoading.value = false
             }
         }

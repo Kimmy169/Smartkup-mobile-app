@@ -30,7 +30,7 @@ class ShoppingListViewModel(private val repository: ShoppingListRepository) : Vi
         viewModelScope.launch {
             _shops.value = repository.fetchShops()
             _products.value = repository.fetchProducts()
-            _categories.value = repository.fetchCategories() // <-- ADD THIS
+            _categories.value = repository.fetchCategories()
             loadAllLists()
         }
     }
@@ -64,24 +64,51 @@ class ShoppingListViewModel(private val repository: ShoppingListRepository) : Vi
         }
     }
 
-    fun addNewItem(listId: Long, productId: Long?, customName: String, quantity: Double, unit: String, shopId: Long?, categoryId: Long?) {
+    fun addNewItem(
+        listId: Long,
+        productId: Long?,
+        customName: String,
+        quantity: Double,
+        unit: String,
+        shopId: Long?,
+        categoryId: Long?,
+        price: Double?
+    ) {
+
+        val uiItem = ShoppingListItem(
+            itemId = System.currentTimeMillis(),
+            listId = listId,
+            productId = productId ?: 0L,
+            productName = customName,
+            categoryId = categoryId,
+            productPrice = price,
+            shopId = shopId,
+            quantity = quantity,
+            unit = unit,
+            purchased = false
+
+        )
+
+
+        val currentData = _listData.value
+        if (currentData != null) {
+            _listData.value = currentData.copy(items = currentData.items + uiItem)
+        }
+
+
+        val dbItem = uiItem.copy(itemId = 0L)
+
+
         viewModelScope.launch {
-            val newItem = ShoppingListItem(
-                itemId = 0L,
-                listId = listId,
-                productId = productId ?: 0L,
-                productName = customName,
-                categoryId = categoryId, // <-- ADD THIS
-                shopId = shopId,
-                quantity = quantity,
-                unit = unit,
-                estimatedPrice = null,
-                actualPrice = null,
-                purchased = false,
-                addedFromPantry = false
-            )
-            val success = repository.addItem(newItem)
-            if (success) loadList(listId)
+            try {
+
+                repository.addItem(dbItem)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+
+                loadList(listId)
+            }
         }
     }
 
@@ -97,7 +124,6 @@ class ShoppingListViewModel(private val repository: ShoppingListRepository) : Vi
         viewModelScope.launch {
             val success = repository.createList(name)
             if (success) {
-                // If the DB saved it successfully, re-download the lists to show the new one!
                 loadAllLists()
             }
         }

@@ -19,14 +19,12 @@ import com.smartkup.smartkup.viewmodel.PantryItemViewModel
 fun CategoryDetailScreen(
     categoryId: Long,
     categoryName: String,
-    viewModel: PantryItemViewModel, // Inject the ViewModel here!
+    viewModel: PantryItemViewModel,
     onNavigateBack: () -> Unit
 ) {
-    // Collect the state from the ViewModel
     val items by viewModel.items.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    // Trigger the data load as soon as this screen opens
     LaunchedEffect(categoryId) {
         viewModel.loadItemsForCategory(categoryId)
     }
@@ -63,7 +61,6 @@ fun CategoryDetailScreen(
                                 modifier = Modifier.padding(16.dp).fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                // Extract the product name safely!
                                 Text(
                                     text = item.product?.name ?: "Neznámý produkt",
                                     fontSize = 18.sp,

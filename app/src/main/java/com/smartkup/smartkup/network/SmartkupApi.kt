@@ -1,7 +1,7 @@
 package com.smartkup.smartkup.network
 
-// This single import grabs Category, Product, Shop, PantryItem, and ShoppingListItem!
-import com.smartkup.smartkup.model.* import retrofit2.Response
+import com.smartkup.smartkup.model.*
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -10,10 +10,6 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SmartkupApi {
-
-    // ----------------------------------------------------
-    // SHARED CORE ENDPOINTS (Categories, Shops, Products)
-    // ----------------------------------------------------
 
     @GET("api/categories")
     suspend fun getCategories(): Response<List<Category>>
@@ -24,20 +20,10 @@ interface SmartkupApi {
     @GET("api/products")
     suspend fun getProducts(): Response<List<Product>>
 
-
-    // ----------------------------------------------------
-    // PANTRY ENDPOINTS
-    // ----------------------------------------------------
-
     @GET("api/categories/{categoryId}/pantry-items")
     suspend fun getPantryItemsByCategory(
         @Path("categoryId") categoryId: Long
     ): Response<List<PantryItem>>
-
-
-    // ----------------------------------------------------
-    // SHOPPING LIST ENDPOINTS
-    // ----------------------------------------------------
 
     @GET("api/shopping-lists/{listId}")
     suspend fun getShoppingList(

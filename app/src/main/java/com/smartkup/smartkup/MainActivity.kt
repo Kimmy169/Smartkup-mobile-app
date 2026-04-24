@@ -15,7 +15,6 @@ import com.smartkup.smartkup.viewmodel.CategoryViewModel
 import com.smartkup.smartkup.viewmodel.PantryItemViewModel
 import com.smartkup.smartkup.viewmodel.ShoppingListViewModel
 
-// --- FACTORIES ---
 class ShoppingListViewModelFactory(private val repository: ShoppingListRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T { return ShoppingListViewModel(repository) as T }
 }
@@ -28,24 +27,20 @@ class PantryItemViewModelFactory(private val repository: CategoryRepository) : V
     override fun <T : ViewModel> create(modelClass: Class<T>): T { return PantryItemViewModel(repository) as T }
 }
 
-// --- MAIN ACTIVITY ---
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val api = RetrofitClient.instance.create(SmartkupApi::class.java)
 
-        // Repositories
         val shoppingRepository = ShoppingListRepository(api)
         val categoryRepository = CategoryRepository(api)
 
         setContent {
-            // Create all 3 ViewModels safely
             val shoppingViewModel: ShoppingListViewModel = viewModel(factory = ShoppingListViewModelFactory(shoppingRepository))
             val categoryViewModel: CategoryViewModel = viewModel(factory = CategoryViewModelFactory(categoryRepository))
             val pantryItemViewModel: PantryItemViewModel = viewModel(factory = PantryItemViewModelFactory(categoryRepository))
 
-            // Pass them all into the Navigation
             AppNavigation(
                 shoppingListViewModel = shoppingViewModel,
                 categoryViewModel = categoryViewModel,

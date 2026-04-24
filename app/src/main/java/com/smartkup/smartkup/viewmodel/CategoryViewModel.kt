@@ -11,11 +11,9 @@ import kotlinx.coroutines.launch
 
 class CategoryViewModel(private val repository: CategoryRepository) : ViewModel() {
 
-    // The StateFlow that our Compose UI will observe
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories.asStateFlow()
 
-    // Automatically fetch data when this ViewModel is created
     init {
         loadCategories()
     }

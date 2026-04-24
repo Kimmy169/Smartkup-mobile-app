@@ -22,11 +22,9 @@ fun ShoppingListsOverviewScreen(
     viewModel: ShoppingListViewModel,
     onNavigateToList: (Long) -> Unit
 ) {
-    // Fetch the real lists from the database via ViewModel!
     val shoppingLists by viewModel.overviewLists.collectAsState()
     var showAddListDialog by remember { mutableStateOf(false) }
 
-    // Optional: Refresh lists when screen appears
     LaunchedEffect(Unit) { viewModel.loadAllLists() }
 
     Scaffold(
@@ -48,8 +46,6 @@ fun ShoppingListsOverviewScreen(
             }
         }
     ) { padding ->
-
-        // If empty, the screen is clean. Otherwise, show the grid!
         if (shoppingLists.isNotEmpty()) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
@@ -60,7 +56,7 @@ fun ShoppingListsOverviewScreen(
             ) {
                 items(shoppingLists) { list ->
                     ElevatedCard(
-                        onClick = { onNavigateToList(list.listId) }, // Use the REAL Database ID
+                        onClick = { onNavigateToList(list.listId) },
                         modifier = Modifier.fillMaxWidth().height(80.dp)
                     ) {
                         Row(
@@ -69,7 +65,7 @@ fun ShoppingListsOverviewScreen(
                         ) {
                             Icon(Icons.Filled.ShoppingCart, contentDescription = null, modifier = Modifier.size(32.dp), tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(12.dp))
-                            Text(text = list.name, fontSize = 18.sp, fontWeight = FontWeight.Bold) // Use REAL Database Name
+                            Text(text = list.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }

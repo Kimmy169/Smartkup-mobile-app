@@ -17,7 +17,9 @@ import com.smartkup.smartkup.viewmodel.ShoppingListViewModel
 fun AppNavigation(
     shoppingListViewModel: ShoppingListViewModel,
     categoryViewModel: CategoryViewModel,
-    pantryItemViewModel: PantryItemViewModel
+    pantryItemViewModel: PantryItemViewModel,
+    isDarkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit
 ) {
     val navController = rememberNavController()
 
@@ -106,7 +108,16 @@ fun AppNavigation(
                 )
             }
 
-            composable(BottomNavItem.Profile.route) { ProfileScreen() }
+            // ==========================================
+            // UPDATED: Profile Screen now routes to UserScreen
+            // ==========================================
+            composable(BottomNavItem.Profile.route) {
+                UserScreen(
+                    isDarkTheme = isDarkTheme,
+                    onThemeChange = onThemeChange,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
         }
     }
 }
